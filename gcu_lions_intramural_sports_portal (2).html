@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GCU Lions Intramural Sports Portal | Georgian Court University</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gcu: {
+              navy: '#00205B',
+              darknavy: '#0B1B3D',
+              gold: '#EAAA00',
+              brightgold: '#F3A712',
+              card: 'rgba(15, 23, 42, 0.85)',
+            }
+          },
+          fontFamily: {
+            heading: ['Montserrat', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar & Utility Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+    
+    .glass-card {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-nav {
+      background: rgba(0, 32, 91, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 2px solid #EAAA00;
+    }
+
+    .lion-gradient-text {
+      background: linear-gradient(135deg, #FFFFFF 30%, #EAAA00 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gold-btn {
+      background: linear-gradient(135deg, #EAAA00 0%, #B8860B 100%);
+      transition: all 0.3s ease;
+    }
+    .gold-btn:hover {
+      background: linear-gradient(135deg, #F3A712 0%, #EAAA00 100%);
+      box-shadow: 0 0 20px rgba(234, 170, 0, 0.4);
+    }
+
+    .active-tab {
+      color: #EAAA00 !important;
+      border-bottom: 3px solid #EAAA00 !important;
+      background: rgba(234, 170, 0, 0.1);
+    }
+
+    .star-rating {
+      direction: rtl;
+      display: inline-flex;
+    }
+    .star-rating input { display: none; }
+    .star-rating label {
+      color: #475569;
+      font-size: 1.75rem;
+      padding: 0 0.15rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+      color: #EAAA00;
+    }
+  </style>
+</head>
+<body class="font-body text-slate-200 min-h-screen flex flex-col bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gcu-darknavy via-slate-950 to-black">
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-24 right-5 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+
+  <!-- Main Navigation Header -->
+  <header class="sticky top-0 z-40 glass-nav shadow-2xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo Branding -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-gcu-gold to-yellow-300 flex items-center justify-center text-gcu-navy font-extrabold text-2xl shadow-lg ring-2 ring-yellow-400/50">
+            🦁
+          </div>
+          <div>
+            <div class="font-heading font-black text-xl tracking-wider text-white flex items-center gap-1.5">
+              GCU <span class="text-gcu-gold">LIONS</span>
+            </div>
+            <div class="text-[10px] tracking-widest text-slate-300 font-semibold uppercase">Intramural Sports Portal</div>
+          </div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="hidden lg:flex space-x-1">
+          <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-300 hover:text-gcu-gold flex items-center gap-1.5">
+            <i data-lucide="home" class="w-4 h-4"></i> Overview
+          </button>
+          <button onclick="switchTab('teams')" id="nav-teams" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-300 hover:text-gcu-gold flex items-center gap-1.5">
+            <i data-lucide="shield" class="w-4 h-4"></i> Teams Hub <span id="badge-team-count" class="bg-gcu-gold text-gcu-navy px-1.5 py-0.5 rounded-full text-[10px] font-extrabold">0</span>
+          </button>
+          <button onclick="switchTab('brackets')" id="nav-brackets" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-300 hover:text-gcu-gold flex items-center gap-1.5">
+            <i data-lucide="git-fork" class="w-4 h-4"></i> Brackets & Standings
+          </button>
+          <button onclick="switchTab('scores')" id="nav-scores" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-300 hover:text-gcu-gold flex items-center gap-1.5">
+            <i data-lucide="award" class="w-4 h-4"></i> Post & View Scores
+          </button>
+          <button onclick="switchTab('gallery')" id="nav-gallery" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-300 hover:text-gcu-gold flex items-center gap-1.5">
+            <i data-lucide="camera" class="w-4 h-4"></i> Media Gallery
+          </button>
+          <button onclick="switchTab('survey')" id="nav-survey" class="nav-btn px-3 py-2 rounded-lg text-xs font-bold transition-all duration-200 text-slate-300 hover:text-gcu-gold flex items-center gap-1.5">
+            <i data-lucide="file-text" class="w-4 h-4"></i> Survey
+          </button>
+        </nav>
+
+        <!-- Right Header Action -->
+        <div class="hidden sm:flex items-center space-x-3">
+          <button onclick="openModal('add-team-modal')" class="gold-btn text-gcu-navy font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider shadow-lg flex items-center gap-1.5">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Create Team
+          </button>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <div class="lg:hidden flex items-center">
+          <button id="mobile-menu-btn" class="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-slate-900 border-b border-slate-800 px-4 pt-2 pb-4 space-y-2">
+      <button onclick="switchTab('home')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="home" class="w-4 h-4"></i> Overview
+      </button>
+      <button onclick="switchTab('teams')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="shield" class="w-4 h-4"></i> Teams Hub
+      </button>
+      <button onclick="switchTab('brackets')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="git-fork" class="w-4 h-4"></i> Brackets & Standings
+      </button>
+      <button onclick="switchTab('scores')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="award" class="w-4 h-4"></i> Post Match Scores
+      </button>
+      <button onclick="switchTab('gallery')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="camera" class="w-4 h-4"></i> Photo Gallery
+      </button>
+      <button onclick="switchTab('survey')" class="w-full text-left px-3 py-2 rounded-md font-medium text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+        <i data-lucide="file-text" class="w-4 h-4"></i> Program Survey
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-grow">
+
+    <!-- ==================== TAB 1: OVERVIEW & HOME ==================== -->
+    <section id="tab-home" class="tab-content py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
+      
+      <!-- Hero Banner -->
+      <div class="relative rounded-3xl overflow-hidden glass-card border border-slate-700/60 p-8 md:p-12 bg-gradient-to-r from-gcu-navy via-slate-900 to-slate-950 shadow-2xl">
+        <div class="absolute -right-12 -bottom-16 opacity-10 text-[240px] select-none font-black text-gcu-gold pointer-events-none">
+          🦁
+        </div>
+        <div class="relative z-10 max-w-3xl space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-yellow-500/10 border border-gcu-gold/30 text-gcu-gold text-xs font-bold uppercase tracking-wider">
+            <span class="w-2.5 h-2.5 rounded-full bg-gcu-gold animate-ping"></span> Fall Launch • Georgian Court University
+          </div>
+          <h1 class="font-heading text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight">
+            BUILT FOR <span class="lion-gradient-text">EVERY LION.</span>
+          </h1>
+          <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
+            GCU’s Inaugural Intramural Sports Program is officially live! Co-ed teams, open rosters, six exciting sports. Varsity athletes, commuters, residents, faculty, and staff share the court together.
+          </p>
+
+          <div class="flex flex-wrap gap-4 pt-2">
+            <button onclick="openModal('add-team-modal')" class="gold-btn text-gcu-navy font-bold px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-xl flex items-center gap-2 transform hover:scale-105 transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> Create Your Team
+            </button>
+            <button onclick="switchTab('survey')" class="bg-slate-800/80 hover:bg-slate-700 border border-slate-600 text-white font-bold px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 transition">
+              <i data-lucide="clipboard-check" class="w-4 h-4"></i> Take 60s Survey
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Welcome Message from Soto -->
+      <div class="glass-card rounded-2xl p-6 md:p-8 border-l-4 border-l-gcu-gold relative shadow-xl">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+          <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-gcu-navy to-gcu-gold flex items-center justify-center text-3xl font-extrabold text-white flex-shrink-0 shadow-lg ring-2 ring-gcu-gold/40">
+            SG
+          </div>
+          <div class="space-y-3 flex-1">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <h3 class="font-heading font-bold text-xl text-white">A Message from Soto</h3>
+                <p class="text-xs text-gcu-gold font-semibold">Assistant Director of Student Activities & Campus Life</p>
+              </div>
+              <a href="mailto:sgkosdis@georgian.edu" class="text-xs text-slate-400 hover:text-gcu-gold flex items-center gap-1 transition bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
+                <i data-lucide="mail" class="w-3.5 h-3.5"></i> sgkosdis@georgian.edu
+              </a>
+            </div>
+            <p class="text-slate-300 text-sm leading-relaxed italic">
+              "Hey Lions! My name is Sotirios Gkosdis (Soto). We are launching something brand new this year—and it starts with YOU. Six potential sports, co-ed teams, open to every student, commuter, resident, and faculty member on campus. Our goal is simple: to give every Lion a genuine, visible place on this campus."
+            </p>
+            <div class="pt-2 flex flex-wrap items-center justify-between border-t border-slate-800 text-xs text-slate-400 gap-2">
+              <span><strong>Office:</strong> Jeffries Hall 101 • Georgian Court University</span>
+              <a href="https://forms.gle/bqkSQbWbaNAvoqFfA" target="_blank" class="text-gcu-gold hover:underline font-bold flex items-center gap-1">
+                Official Google Form <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Six Sports Grid -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-heading font-bold text-2xl text-white">6 Inaugural Sports</h2>
+            <p class="text-slate-400 text-xs">Register teams in any sport or play as a free agent</p>
+          </div>
+          <button onclick="switchTab('teams')" class="text-gcu-gold text-xs font-bold hover:underline flex items-center gap-1">
+            View All Teams <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div id="home-sports-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 2: TEAMS HUB & SEARCH ==================== -->
+    <section id="tab-teams" class="tab-content hidden py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+      
+      <!-- Top Action Bar -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-6 rounded-2xl border border-slate-800">
+        <div>
+          <h2 class="font-heading text-2xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="shield" class="text-gcu-gold w-6 h-6"></i> Registered Teams & Roster Directory
+          </h2>
+          <p class="text-slate-400 text-xs mt-1">Search, filter, or create new teams to accommodate hundreds of players across campus.</p>
+        </div>
+
+        <button onclick="openModal('add-team-modal')" class="gold-btn text-gcu-navy font-bold px-5 py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg flex items-center gap-2 flex-shrink-0">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> Add New Team
+        </button>
+      </div>
+
+      <!-- Search & Filter Controls -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <div class="md:col-span-8 relative">
+          <i data-lucide="search" class="w-4 h-4 absolute left-4 top-3.5 text-slate-400"></i>
+          <input type="text" id="team-search-input" oninput="filterTeams()" placeholder="Search team name, captain name, or teammate..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-xs text-white focus:outline-none focus:border-gcu-gold">
+        </div>
+
+        <div class="md:col-span-4">
+          <select id="team-sport-filter" onchange="filterTeams()" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-xs text-slate-200 focus:outline-none focus:border-gcu-gold">
+            <option value="ALL">All Sports Filter</option>
+            <option value="Volleyball">🏐 Volleyball</option>
+            <option value="Futsal">⚽ Futsal</option>
+            <option value="Basketball">🏀 Basketball</option>
+            <option value="Ultimate Frisbee">🥏 Ultimate Frisbee</option>
+            <option value="Dodgeball">🟠 Dodgeball</option>
+            <option value="Kickball">⚾ Kickball</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Teams Cards Grid -->
+      <div id="teams-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Injected via JS -->
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 3: BRACKETS & STANDINGS ==================== -->
+    <section id="tab-brackets" class="tab-content hidden py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
+      
+      <!-- Tournament Header -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-6 rounded-2xl border border-slate-800">
+        <div>
+          <h2 class="font-heading text-2xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="git-fork" class="text-gcu-gold w-6 h-6"></i> Tournament Bracket Tree
+          </h2>
+          <p class="text-slate-400 text-xs mt-1">Interactive bracket simulator. Matches advance automatically when scores are saved!</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <select id="bracket-sport-select" onchange="renderBracketTree(this.value)" class="bg-slate-950 border border-slate-700 text-slate-200 text-xs font-semibold rounded-xl px-4 py-2.5 focus:border-gcu-gold">
+            <option value="Volleyball">🏐 Volleyball Bracket</option>
+            <option value="Futsal">⚽ Futsal Bracket</option>
+            <option value="Basketball">🏀 Basketball Bracket</option>
+            <option value="Ultimate Frisbee">🥏 Ultimate Frisbee Bracket</option>
+            <option value="Dodgeball">🟠 Dodgeball Bracket</option>
+            <option value="Kickball">⚾ Kickball Bracket</option>
+          </select>
+
+          <button onclick="resetBracketData()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-2.5 rounded-xl border border-slate-700 transition flex items-center gap-1">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Visual Bracket Tree -->
+      <div class="glass-card rounded-2xl p-6 md:p-8 border border-slate-800 overflow-x-auto min-h-[480px]">
+        <div id="bracket-tree-container" class="min-w-[800px] grid grid-cols-3 gap-8 relative items-center">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- Standings Table -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-heading font-bold text-xl text-white flex items-center gap-2">
+            <i data-lucide="bar-chart-2" class="text-gcu-gold w-5 h-5"></i> Division Standings & Leaderboard
+          </h3>
+          <span class="text-xs text-slate-400">Auto-updated from posted match results</span>
+        </div>
+
+        <div class="glass-card rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-slate-800 bg-slate-950/90 text-xs uppercase tracking-wider text-slate-400">
+                  <th class="py-3.5 px-6">Rank</th>
+                  <th class="py-3.5 px-6">Team</th>
+                  <th class="py-3.5 px-4 text-center">Sport</th>
+                  <th class="py-3.5 px-4 text-center">Played</th>
+                  <th class="py-3.5 px-4 text-center">Wins</th>
+                  <th class="py-3.5 px-4 text-center">Losses</th>
+                  <th class="py-3.5 px-4 text-center">Points</th>
+                  <th class="py-3.5 px-6 text-center">Point Diff</th>
+                </tr>
+              </thead>
+              <tbody id="standings-tbody" class="divide-y divide-slate-800/60 text-slate-200">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 4: POST & VIEW MATCH SCORES ==================== -->
+    <section id="tab-scores" class="tab-content hidden py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-6 rounded-2xl border border-slate-800">
+        <div>
+          <h2 class="font-heading text-2xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="award" class="text-gcu-gold w-6 h-6"></i> Game Scoreboard & Publisher
+          </h2>
+          <p class="text-slate-400 text-xs mt-1">Post official match outcomes or update live scores in real time.</p>
+        </div>
+
+        <button onclick="openModal('post-score-modal')" class="gold-btn text-gcu-navy font-bold px-5 py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg flex items-center gap-2">
+          <i data-lucide="plus-square" class="w-4 h-4"></i> Post New Score
+        </button>
+      </div>
+
+      <!-- Recent Matches List -->
+      <div class="space-y-4">
+        <h3 class="font-heading font-bold text-lg text-white">Recent Match Outcomes</h3>
+        <div id="recent-scores-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 5: MEDIA & PHOTO GALLERY ==================== -->
+    <section id="tab-gallery" class="tab-content hidden py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-6 rounded-2xl border border-slate-800">
+        <div>
+          <h2 class="font-heading text-2xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="camera" class="text-gcu-gold w-6 h-6"></i> Campus Game Photos
+          </h2>
+          <p class="text-slate-400 text-xs mt-1">Share photos from games, team celebrations, and court moments.</p>
+        </div>
+
+        <button onclick="openModal('upload-photo-modal')" class="gold-btn text-gcu-navy font-bold px-5 py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg flex items-center gap-2">
+          <i data-lucide="upload-cloud" class="w-4 h-4"></i> Upload Photo
+        </button>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div id="gallery-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Injected via JS -->
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 6: SATISFACTION SURVEY ==================== -->
+    <section id="tab-survey" class="tab-content hidden py-8 md:py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-8">
+      
+      <!-- Survey Card -->
+      <div class="glass-card rounded-2xl p-6 md:p-10 border border-slate-700 shadow-2xl space-y-8">
+        
+        <div class="text-center space-y-3">
+          <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-gcu-gold to-yellow-300 text-gcu-navy flex items-center justify-center text-3xl font-black shadow-lg">
+            📋
+          </div>
+          <h2 class="font-heading text-3xl font-extrabold text-white">Intramural Sports Feedback Survey</h2>
+          <p class="text-slate-300 text-xs max-w-lg mx-auto">
+            Takes less than 60 seconds! Your feedback helps Assistant Director Soto and Campus Life finalize game times, formats, and equipment.
+          </p>
+        </div>
+
+        <form id="native-survey-form" onsubmit="handleSurveySubmit(event)" class="space-y-6 pt-4 border-t border-slate-800">
+          
+          <!-- Rating -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">How excited are you about GCU Intramurals?</label>
+            <div class="star-rating">
+              <input type="radio" id="star5" name="rating" value="5" required /><label for="star5">★</label>
+              <input type="radio" id="star4" name="rating" value="4" /><label for="star4">★</label>
+              <input type="radio" id="star3" name="rating" value="3" /><label for="star3">★</label>
+              <input type="radio" id="star2" name="rating" value="2" /><label for="star2">★</label>
+              <input type="radio" id="star1" name="rating" value="1" /><label for="star1">★</label>
+            </div>
+          </div>
+
+          <!-- Preferred Sports -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Which sports are you planning to play? (Select all)</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <label class="flex items-center space-x-2 bg-slate-900 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-gcu-gold">
+                <input type="checkbox" name="sports_pref" value="Volleyball" class="w-4 h-4 text-gcu-gold rounded">
+                <span class="text-xs font-semibold text-slate-200">🏐 Volleyball</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-gcu-gold">
+                <input type="checkbox" name="sports_pref" value="Futsal" class="w-4 h-4 text-gcu-gold rounded">
+                <span class="text-xs font-semibold text-slate-200">⚽ Futsal</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-gcu-gold">
+                <input type="checkbox" name="sports_pref" value="Basketball" class="w-4 h-4 text-gcu-gold rounded">
+                <span class="text-xs font-semibold text-slate-200">🏀 Basketball</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-gcu-gold">
+                <input type="checkbox" name="sports_pref" value="Frisbee" class="w-4 h-4 text-gcu-gold rounded">
+                <span class="text-xs font-semibold text-slate-200">🥏 Frisbee</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-gcu-gold">
+                <input type="checkbox" name="sports_pref" value="Dodgeball" class="w-4 h-4 text-gcu-gold rounded">
+                <span class="text-xs font-semibold text-slate-200">🟠 Dodgeball</span>
+              </label>
+              <label class="flex items-center space-x-2 bg-slate-900 p-3 rounded-xl border border-slate-800 cursor-pointer hover:border-gcu-gold">
+                <input type="checkbox" name="sports_pref" value="Kickball" class="w-4 h-4 text-gcu-gold rounded">
+                <span class="text-xs font-semibold text-slate-200">⚾ Kickball</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Time & Day -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Preferred Play Times</label>
+              <select name="time_pref" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white focus:border-gcu-gold">
+                <option value="Weekday Evenings (6-9 PM)">Weekday Evenings (6-9 PM)</option>
+                <option value="Weekday Afternoons (3-6 PM)">Weekday Afternoons (3-6 PM)</option>
+                <option value="Weekend Mornings">Weekend Mornings</option>
+                <option value="Flexible">Flexible / Anytime</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Your GCU Status</label>
+              <select name="user_status" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white focus:border-gcu-gold">
+                <option value="Resident Student">Resident Student</option>
+                <option value="Commuter Student">Commuter Student</option>
+                <option value="Varsity Student-Athlete">Varsity Student-Athlete</option>
+                <option value="Faculty / Staff">Faculty / Staff Member</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Text Feedback -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Suggestions or Questions for Soto?</label>
+            <textarea name="comments" rows="3" placeholder="Tell us what you'd like to see, preferred tournament formats, etc." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white focus:border-gcu-gold focus:outline-none"></textarea>
+          </div>
+
+          <button type="submit" class="w-full gold-btn text-gcu-navy font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2">
+            <i data-lucide="send" class="w-4 h-4"></i> Submit Survey Response
+          </button>
+        </form>
+
+        <div class="pt-4 border-t border-slate-800 text-center">
+          <p class="text-xs text-slate-400">
+            Prefer using the official Google Form? <a href="https://forms.gle/bqkSQbWbaNAvoqFfA" target="_blank" class="text-gcu-gold hover:underline font-bold">Click here to open Google Form <i data-lucide="external-link" class="w-3 h-3 inline"></i></a>
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gcu-darknavy border-t border-slate-800 mt-16 py-12 px-4 sm:px-6 lg:px-8 text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="space-y-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-gcu-gold flex items-center justify-center text-gcu-navy font-black text-base">🦁</div>
+          <span class="font-heading font-extrabold text-white text-base">GCU LIONS INTRAMURALS</span>
+        </div>
+        <p class="text-slate-400 leading-relaxed">
+          The official Intramural Sports Portal of Georgian Court University. Connecting students, faculty, commuters, and staff.
+        </p>
+        <div class="text-gcu-gold font-bold uppercase tracking-wider">#GoLions #GCUIntramurals</div>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="font-heading font-bold text-white text-sm">Program Leadership</h4>
+        <p class="text-slate-200 font-semibold">Sotirios Gkosdis (Soto)</p>
+        <p class="text-slate-400">Assistant Director of Student Activities & Campus Life</p>
+        <p class="text-slate-300">Office: Jeffries Hall 101 • 900 Lakewood Ave, Lakewood, NJ 08701</p>
+        <p class="text-slate-300">Email: sgkosdis@georgian.edu</p>
+      </div>
+
+      <div class="space-y-3">
+        <h4 class="font-heading font-bold text-white text-sm">Quick Links</h4>
+        <div class="flex flex-col space-y-1.5">
+          <a href="https://forms.gle/bqkSQbWbaNAvoqFfA" target="_blank" class="text-gcu-gold hover:underline font-bold">Official Google Survey Form</a>
+          <button onclick="switchTab('teams')" class="text-slate-300 hover:text-white text-left">View All Teams</button>
+          <button onclick="switchTab('scores')" class="text-slate-300 hover:text-white text-left">Latest Scoreboard</button>
+        </div>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto mt-8 pt-6 border-t border-slate-800 text-center text-slate-500">
+      &copy; 2026 Georgian Court University Campus Life. All Rights Reserved.
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL 1: ADD TEAM MODAL ==================== -->
+  <div id="add-team-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-2xl p-6 border border-slate-700 shadow-2xl relative space-y-5 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('add-team-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div>
+        <span class="text-xs font-bold text-gcu-gold uppercase tracking-wider">Team Registration</span>
+        <h3 class="font-heading font-bold text-2xl text-white mt-0.5">Create a New Team</h3>
+      </div>
+
+      <form id="create-team-form" onsubmit="handleCreateTeam(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Team Name</label>
+          <input type="text" id="modal-team-name" required placeholder="e.g. Court Crashers, Lakewood Strikers" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-gcu-gold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Sport</label>
+            <select id="modal-team-sport" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-gcu-gold">
+              <option value="Volleyball">🏐 Volleyball</option>
+              <option value="Futsal">⚽ Futsal</option>
+              <option value="Basketball">🏀 Basketball</option>
+              <option value="Ultimate Frisbee">🥏 Ultimate Frisbee</option>
+              <option value="Dodgeball">🟠 Dodgeball</option>
+              <option value="Kickball">⚾ Kickball</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Team Mascot Emoji</label>
+            <select id="modal-team-emoji" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-gcu-gold">
+              <option value="🦁">🦁 Lion</option>
+              <option value="🔥">🔥 Fire</option>
+              <option value="⚡">⚡ Lightning</option>
+              <option value="🦅">🦅 Eagle</option>
+              <option value="👑">👑 Crown</option>
+              <option value="🐺">🐺 Wolf</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Captain Name</label>
+            <input type="text" id="modal-captain-name" required placeholder="Sotirios Gkosdis" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-gcu-gold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">GCU Email</label>
+            <input type="email" id="modal-captain-email" required placeholder="sgkosdis@georgian.edu" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-gcu-gold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Division Mix</label>
+          <select id="modal-team-division" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-gcu-gold">
+            <option value="Co-Ed Mixed (Students & Staff)">Co-Ed Mixed (Students & Staff)</option>
+            <option value="Resident Students">Resident Students</option>
+            <option value="Commuter Students">Commuter Students</option>
+            <option value="Varsity & Club Mix">Varsity & Club Mix</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Initial Teammates (Comma Separated)</label>
+          <input type="text" id="modal-team-roster" placeholder="Jordan P., Taylor S., Morgan K." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-gcu-gold">
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-3">
+          <button type="button" onclick="closeModal('add-team-modal')" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white">Cancel</button>
+          <button type="submit" class="gold-btn text-gcu-navy font-bold px-5 py-2.5 rounded-xl text-xs uppercase shadow">Register Team</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: POST SCORE MODAL ==================== -->
+  <div id="post-score-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-2xl p-6 border border-slate-700 shadow-2xl relative space-y-5">
+      <button onclick="closeModal('post-score-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div>
+        <span class="text-xs font-bold text-gcu-gold uppercase tracking-wider">Official Scoreboard</span>
+        <h3 class="font-heading font-bold text-2xl text-white mt-0.5">Publish Match Result</h3>
+      </div>
+
+      <form id="post-score-form" onsubmit="handlePostScore(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Sport</label>
+          <select id="score-modal-sport" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-gcu-gold">
+            <option value="Volleyball">🏐 Volleyball</option>
+            <option value="Futsal">⚽ Futsal</option>
+            <option value="Basketball">🏀 Basketball</option>
+            <option value="Ultimate Frisbee">🥏 Ultimate Frisbee</option>
+            <option value="Dodgeball">🟠 Dodgeball</option>
+            <option value="Kickball">⚾ Kickball</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Home Team</label>
+            <input type="text" id="score-team1" required placeholder="Team A Name" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-gcu-gold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Score</label>
+            <input type="number" id="score-num1" required min="0" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-center font-bold text-white focus:border-gcu-gold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Away Team</label>
+            <input type="text" id="score-team2" required placeholder="Team B Name" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-gcu-gold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Score</label>
+            <input type="number" id="score-num2" required min="0" value="0" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-center font-bold text-white focus:border-gcu-gold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Highlight / Game Notes</label>
+          <input type="text" id="score-notes" placeholder="e.g. Overtime thriller, incredible clutch serve by Alex!" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-gcu-gold">
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" onclick="closeModal('post-score-modal')" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white">Cancel</button>
+          <button type="submit" class="gold-btn text-gcu-navy font-bold px-5 py-2.5 rounded-xl text-xs uppercase shadow">Post Result</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: UPLOAD PHOTO MODAL ==================== -->
+  <div id="upload-photo-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-2xl p-6 border border-slate-700 shadow-2xl relative space-y-5">
+      <button onclick="closeModal('upload-photo-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div>
+        <span class="text-xs font-bold text-gcu-gold uppercase tracking-wider">Media Portal</span>
+        <h3 class="font-heading font-bold text-2xl text-white mt-0.5">Post Match Photo</h3>
+      </div>
+
+      <form id="upload-photo-form" onsubmit="handlePhotoUpload(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Image URL (or select sample)</label>
+          <input type="url" id="photo-url" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-gcu-gold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Photo Caption</label>
+          <input type="text" id="photo-caption" required placeholder="Championship spike in the Wellness Center!" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-gcu-gold">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Sport Tag</label>
+            <select id="photo-sport" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:border-gcu-gold">
+              <option value="Volleyball">🏐 Volleyball</option>
+              <option value="Futsal">⚽ Futsal</option>
+              <option value="Basketball">🏀 Basketball</option>
+              <option value="Frisbee">🥏 Frisbee</option>
+              <option value="Dodgeball">🟠 Dodgeball</option>
+              <option value="Kickball">⚾ Kickball</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">Photographer / Student</label>
+            <input type="text" id="photo-uploader" required placeholder="Alex R." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:border-gcu-gold">
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" onclick="closeModal('upload-photo-modal')" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white">Cancel</button>
+          <button type="submit" class="gold-btn text-gcu-navy font-bold px-5 py-2.5 rounded-xl text-xs uppercase shadow">Upload to Gallery</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. DATA STRUCTURES & LOCAL STORAGE PERSISTENCE
+       ========================================================================== */
+    const SPORTS_METADATA = [
+      { id: 'Volleyball', icon: '🏐', format: '6v6 Co-Ed', venue: 'Wellness Center Gym', desc: 'Fast, easy to pick up, and energetic. Multi-division league.' },
+      { id: 'Futsal', icon: '⚽', format: '5v5 Small-Sided', venue: 'Indoor Courts', desc: 'Small-sided indoor soccer with high intensity and fast passing.' },
+      { id: 'Basketball', icon: '🏀', format: '5v5 Traditional', venue: 'Main Gym', desc: 'Traditional full court basketball league for all skill levels.' },
+      { id: 'Ultimate Frisbee', icon: '🥏', format: '7v7 Outdoor/Indoor', venue: 'GCU Quad / Turf Field', desc: 'Laid-back, fun disc sports centered around campus community.' },
+      { id: 'Dodgeball', icon: '🟠', format: '6v6 Chaos', venue: 'Auxiliary Gym', desc: 'Pure nostalgic dodgeball action! Fast games and intense laughs.' },
+      { id: 'Kickball', icon: '⚾', format: '10v10 Open Roster', venue: 'Campus Softball Field', desc: 'No experience required! Maximum fun guaranteed for everyone.' }
+    ];
+
+    const DEFAULT_TEAMS = [
+      { id: 't1', name: 'Court Crashers', sport: 'Volleyball', emoji: '🦁', captain: 'Alex Rivera', email: 'arivera@georgian.edu', division: 'Resident Students', roster: ['Taylor S.', 'Jordan P.', 'Morgan K.'] },
+      { id: 't2', name: 'Jeffries Spikers', sport: 'Volleyball', emoji: '🔥', captain: 'Sotirios Gkosdis', email: 'sgkosdis@georgian.edu', division: 'Faculty / Staff Mix', roster: ['Chris M.', 'Pat D.', 'Sam T.'] },
+      { id: 't3', name: 'Lakewood Strikers', sport: 'Futsal', emoji: '⚡', captain: 'Carlos Rossi', email: 'crossi@georgian.edu', division: 'Commuter Students', roster: ['Mateo G.', 'Luis V.', 'Anna P.'] },
+      { id: 't4', name: 'Golden Hoopers', sport: 'Basketball', emoji: '👑', captain: 'Marcus Vance', email: 'mvance@georgian.edu', division: 'Varsity & Club Mix', roster: ['James L.', 'Tyrell K.', 'Derrick W.'] },
+      { id: 't5', name: 'Disc Dynamics', sport: 'Ultimate Frisbee', emoji: '🦅', captain: 'Elena Rostova', email: 'erostova@georgian.edu', division: 'Co-Ed Mixed', roster: ['Zack T.', 'Ollie K.', 'Renee S.'] },
+      { id: 't6', name: 'Ball Dodgers', sport: 'Dodgeball', emoji: '🐺', captain: 'Dave Miller', email: 'dmiller@georgian.edu', division: 'Resident Students', roster: ['Chloe B.', 'Eric W.', 'Lisa C.'] }
+    ];
+
+    const DEFAULT_SCORES = [
+      { id: 's1', sport: 'Volleyball', team1: 'Court Crashers', score1: 2, team2: 'Jeffries Spikers', score2: 1, notes: 'Thrilling 3-set comeback victory!', date: 'Oct 10' },
+      { id: 's2', sport: 'Futsal', team1: 'Lakewood Strikers', score1: 4, team2: 'Turf Titans', score2: 2, notes: 'Carlos Rossi scored a hat trick.', date: 'Oct 11' },
+      { id: 's3', sport: 'Basketball', team1: 'Golden Hoopers', score1: 52, team2: 'Faculty Ballers', score2: 48, notes: 'Clutch 3-pointer in final minute.', date: 'Oct 12' }
+    ];
+
+    const DEFAULT_PHOTOS = [
+      { id: 'p1', url: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=800&q=80', caption: 'Championship match match-point serve!', sport: 'Volleyball', uploader: 'Soto G.', likes: 24 },
+      { id: 'p2', url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=800&q=80', caption: 'Futsal fast-break goal under the lights', sport: 'Futsal', uploader: 'Carlos R.', likes: 18 },
+      { id: 'p3', url: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=800&q=80', caption: 'Full court action in the Wellness Gym!', sport: 'Basketball', uploader: 'Marcus V.', likes: 31 }
+    ];
+
+    let BRACKETS_STORE = {
+      'Volleyball': [
+        { id: '1', round: 1, team1: 'Court Crashers', score1: 2, team2: 'Lions Blockers', score2: 0, winner: 'Court Crashers' },
+        { id: '2', round: 1, team1: 'Jeffries Spikers', score1: 2, team2: 'Net Ninjas', score2: 1, winner: 'Jeffries Spikers' },
+        { id: '3', round: 2, team1: 'Court Crashers', score1: 0, team2: 'Jeffries Spikers', score2: 0, winner: null }
+      ],
+      'Futsal': [
+        { id: '1', round: 1, team1: 'Lakewood Strikers', score1: 3, team2: 'Turf Titans', score2: 1, winner: 'Lakewood Strikers' },
+        { id: '2', round: 1, team1: 'GCU United', score1: 2, team2: 'Futsal Flyers', score2: 4, winner: 'Futsal Flyers' },
+        { id: '3', round: 2, team1: 'Lakewood Strikers', score1: 0, team2: 'Futsal Flyers', score2: 0, winner: null }
+      ]
+    };
+
+    // State Variables
+    let teamsStore = [];
+    let scoresStore = [];
+    let photosStore = [];
+
+    /* ==========================================================================
+       2. APPLICATION INIT & RENDERING
+       ========================================================================== */
+    window.onload = function() {
+      // Load saved state or set defaults
+      teamsStore = JSON.parse(localStorage.getItem('gcu_app_teams')) || DEFAULT_TEAMS;
+      scoresStore = JSON.parse(localStorage.getItem('gcu_app_scores')) || DEFAULT_SCORES;
+      photosStore = JSON.parse(localStorage.getItem('gcu_app_photos')) || DEFAULT_PHOTOS;
+
+      renderHomeSports();
+      renderTeams();
+      renderBracketTree('Volleyball');
+      renderStandings();
+      renderRecentScores();
+      renderGallery();
+      updateBadges();
+
+      // Setup Mobile Drawer Toggle
+      const mobileBtn = document.getElementById('mobile-menu-btn');
+      if (mobileBtn) {
+        mobileBtn.addEventListener('click', () => {
+          document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+      }
+
+      if (window.lucide) lucide.createIcons();
+    };
+
+    function saveState() {
+      localStorage.setItem('gcu_app_teams', JSON.stringify(teamsStore));
+      localStorage.setItem('gcu_app_scores', JSON.stringify(scoresStore));
+      localStorage.setItem('gcu_app_photos', JSON.stringify(photosStore));
+      updateBadges();
+    }
+
+    function updateBadges() {
+      const badge = document.getElementById('badge-team-count');
+      if (badge) badge.textContent = teamsStore.length;
+    }
+
+    /* ==========================================================================
+       3. NAVIGATION & UI HELPERS
+       ========================================================================== */
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active-tab'));
+
+      const targetTab = document.getElementById(`tab-${tabId}`);
+      if (targetTab) targetTab.classList.remove('hidden');
+
+      const targetNav = document.getElementById(`nav-${tabId}`);
+      if (targetNav) targetNav.classList.add('active-tab');
+
+      document.getElementById('mobile-menu').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function showToast(title, message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'glass-card p-4 rounded-xl border-l-4 border-gcu-gold text-white shadow-2xl pointer-events-auto flex items-start space-x-3 transition-all duration-300';
+      toast.innerHTML = `
+        <i data-lucide="check-circle" class="w-5 h-5 text-gcu-gold flex-shrink-0 mt-0.5"></i>
+        <div>
+          <h4 class="font-heading font-bold text-xs text-white">${title}</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">${message}</p>
+        </div>
+      `;
+      container.appendChild(toast);
+      if (window.lucide) lucide.createIcons();
+
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    /* ==========================================================================
+       4. TAB 1: OVERVIEW SPORTS CARDS
+       ========================================================================== */
+    function renderHomeSports() {
+      const container = document.getElementById('home-sports-grid');
+      if (!container) return;
+
+      container.innerHTML = SPORTS_METADATA.map(s => {
+        const count = teamsStore.filter(t => t.sport === s.id).length;
+        return `
+          <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-3 hover:border-gcu-gold/60 transition">
+            <div class="flex items-center justify-between">
+              <span class="text-3xl">${s.icon}</span>
+              <span class="bg-slate-900 border border-slate-700 text-gcu-gold px-2.5 py-1 rounded-full text-[10px] font-bold">
+                ${count} Registered Teams
+              </span>
+            </div>
+            <div>
+              <h3 class="font-heading font-bold text-lg text-white">${s.id}</h3>
+              <span class="text-xs font-semibold text-gcu-gold">${s.format}</span>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">${s.desc}</p>
+            <div class="pt-2 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
+              <span>📍 ${s.venue}</span>
+              <button onclick="switchTab('teams')" class="text-gcu-gold hover:underline font-bold">View Roster →</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ==========================================================================
+       5. TAB 2: TEAMS HUB & SEARCH
+       ========================================================================== */
+    function renderTeams() {
+      const container = document.getElementById('teams-grid-container');
+      const searchVal = document.getElementById('team-search-input')?.value.toLowerCase() || '';
+      const sportFilter = document.getElementById('team-sport-filter')?.value || 'ALL';
+
+      if (!container) return;
+
+      let filtered = teamsStore.filter(t => {
+        const matchSearch = t.name.toLowerCase().includes(searchVal) || 
+                            t.captain.toLowerCase().includes(searchVal) ||
+                            t.roster.some(m => m.toLowerCase().includes(searchVal));
+        const matchSport = sportFilter === 'ALL' || t.sport === sportFilter;
+        return matchSearch && matchSport;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-12 glass-card rounded-2xl border border-slate-800 space-y-3">
+            <p class="text-slate-400 text-sm">No teams found matching your search criteria.</p>
+            <button onclick="openModal('add-team-modal')" class="gold-btn text-gcu-navy font-bold px-4 py-2 rounded-xl text-xs uppercase">
+              Create the First Team
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(t => `
+        <div class="glass-card p-6 rounded-2xl border border-slate-800 space-y-4 relative group hover:border-gcu-gold/60 transition shadow-xl">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center text-2xl shadow">
+                ${t.emoji || '🦁'}
+              </div>
+              <div>
+                <h3 class="font-heading font-bold text-base text-white">${t.name}</h3>
+                <span class="text-xs text-gcu-gold font-semibold">${t.sport}</span>
+              </div>
+            </div>
+            <button onclick="deleteTeam('${t.id}')" class="text-slate-600 hover:text-red-400 transition" title="Delete Team">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="space-y-1.5 text-xs text-slate-300">
+            <div><strong>Captain:</strong> ${t.captain}</div>
+            <div><strong>Email:</strong> ${t.email}</div>
+            <div><strong>Division:</strong> ${t.division}</div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800/80 space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400 font-bold uppercase tracking-wider">
+              <span>Roster Players (${t.roster.length + 1})</span>
+              <button onclick="promptAddPlayer('${t.id}')" class="text-gcu-gold hover:underline flex items-center gap-1">
+                <i data-lucide="user-plus" class="w-3 h-3"></i> Add Player
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="bg-gcu-navy/80 text-gcu-gold px-2 py-0.5 rounded text-[10px] font-bold border border-gcu-gold/30">⭐ ${t.captain} (C)</span>
+              ${t.roster.map(r => `<span class="bg-slate-900 text-slate-300 px-2 py-0.5 rounded text-[10px] border border-slate-800">${r}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function filterTeams() {
+      renderTeams();
+    }
+
+    function handleCreateTeam(e) {
+      e.preventDefault();
+      const name = document.getElementById('modal-team-name').value;
+      const sport = document.getElementById('modal-team-sport').value;
+      const emoji = document.getElementById('modal-team-emoji').value;
+      const captain = document.getElementById('modal-captain-name').value;
+      const email = document.getElementById('modal-captain-email').value;
+      const division = document.getElementById('modal-team-division').value;
+      const rosterRaw = document.getElementById('modal-team-roster').value;
+
+      const roster = rosterRaw.split(',').map(r => r.trim()).filter(r => r.length > 0);
+
+      const newTeam = {
+        id: 'team_' + Date.now(),
+        name,
+        sport,
+        emoji,
+        captain,
+        email,
+        division,
+        roster
+      };
+
+      teamsStore.unshift(newTeam);
+      saveState();
+      renderTeams();
+      renderHomeSports();
+      closeModal('add-team-modal');
+      document.getElementById('create-team-form').reset();
+      showToast('Team Registered!', `"${name}" added to GCU ${sport}.`);
+    }
+
+    function promptAddPlayer(teamId) {
+      const playerName = prompt("Enter new teammate's full name:");
+      if (!playerName || !playerName.trim()) return;
+
+      const team = teamsStore.find(t => t.id === teamId);
+      if (team) {
+        team.roster.push(playerName.trim());
+        saveState();
+        renderTeams();
+        showToast('Player Added', `${playerName} added to ${team.name} roster!`);
+      }
+    }
+
+    function deleteTeam(teamId) {
+      if (!confirm("Are you sure you want to delete this team?")) return;
+      teamsStore = teamsStore.filter(t => t.id !== teamId);
+      saveState();
+      renderTeams();
+      renderHomeSports();
+      showToast('Team Removed', 'The team was successfully deleted.');
+    }
+
+    /* ==========================================================================
+       6. TAB 3: BRACKETS & STANDINGS
+       ========================================================================== */
+    function renderBracketTree(sport) {
+      const container = document.getElementById('bracket-tree-container');
+      if (!container) return;
+
+      const matches = BRACKETS_STORE[sport] || [
+        { id: '1', round: 1, team1: 'Team A', score1: 0, team2: 'Team B', score2: 0, winner: null },
+        { id: '2', round: 1, team1: 'Team C', score1: 0, team2: 'Team D', score2: 0, winner: null },
+        { id: '3', round: 2, team1: 'TBD', score1: 0, team2: 'TBD', score2: 0, winner: null }
+      ];
+
+      const r1 = matches.filter(m => m.round === 1);
+      const r2 = matches.find(m => m.round === 2);
+      const champion = r2 && r2.winner ? r2.winner : 'TBD';
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Semifinals</div>
+          ${r1.map(m => `
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 shadow space-y-1.5">
+              <div class="flex justify-between items-center text-xs text-white">
+                <span class="${m.winner === m.team1 ? 'text-gcu-gold font-bold' : ''}">${m.team1}</span>
+                <span class="font-bold bg-slate-950 px-2 py-0.5 rounded text-[11px]">${m.score1}</span>
+              </div>
+              <div class="flex justify-between items-center text-xs text-white border-t border-slate-800 pt-1.5">
+                <span class="${m.winner === m.team2 ? 'text-gcu-gold font-bold' : ''}">${m.team2}</span>
+                <span class="font-bold bg-slate-950 px-2 py-0.5 rounded text-[11px]">${m.score2}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="space-y-6">
+          <div class="text-xs font-bold text-gcu-gold uppercase tracking-widest text-center">Championship</div>
+          ${r2 ? `
+            <div class="bg-slate-900 border border-gcu-gold/40 rounded-xl p-4 shadow-xl space-y-2">
+              <div class="flex justify-between items-center text-xs text-white">
+                <span class="${r2.winner === r2.team1 ? 'text-gcu-gold font-bold' : ''}">${r2.team1}</span>
+                <span class="font-bold bg-slate-950 px-2 py-0.5 rounded text-[11px]">${r2.score1}</span>
+              </div>
+              <div class="flex justify-between items-center text-xs text-white border-t border-slate-800 pt-2">
+                <span class="${r2.winner === r2.team2 ? 'text-gcu-gold font-bold' : ''}">${r2.team2}</span>
+                <span class="font-bold bg-slate-950 px-2 py-0.5 rounded text-[11px]">${r2.score2}</span>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="text-center space-y-2">
+          <div class="w-16 h-16 mx-auto rounded-full bg-gcu-gold text-gcu-navy flex items-center justify-center text-3xl font-black shadow-lg">🏆</div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Champion</div>
+          <div class="font-heading font-black text-lg text-gcu-gold">${champion}</div>
+        </div>
+      `;
+    }
+
+    function renderStandings() {
+      const tbody = document.getElementById('standings-tbody');
+      if (!tbody) return;
+
+      // Generate Standings dynamically based on teams
+      const standings = teamsStore.map((t, idx) => ({
+        rank: idx + 1,
+        name: t.name,
+        sport: t.sport,
+        p: 3,
+        w: Math.max(0, 3 - idx),
+        l: idx,
+        pts: (Math.max(0, 3 - idx)) * 3,
+        diff: `+${(Math.max(0, 3 - idx)) * 4}`
+      }));
+
+      tbody.innerHTML = standings.map(s => `
+        <tr class="hover:bg-slate-900/50 transition">
+          <td class="py-3.5 px-6 font-bold text-gcu-gold">${s.rank}</td>
+          <td class="py-3.5 px-6 font-bold text-white">${s.name}</td>
+          <td class="py-3.5 px-4 text-center text-xs text-slate-400">${s.sport}</td>
+          <td class="py-3.5 px-4 text-center font-semibold">${s.p}</td>
+          <td class="py-3.5 px-4 text-center text-emerald-400 font-bold">${s.w}</td>
+          <td class="py-3.5 px-4 text-center text-red-400 font-bold">${s.l}</td>
+          <td class="py-3.5 px-4 text-center font-black text-gcu-gold">${s.pts}</td>
+          <td class="py-3.5 px-6 text-center text-xs font-semibold text-slate-300">${s.diff}</td>
+        </tr>
+      `).join('');
+    }
+
+    function resetBracketData() {
+      const sport = document.getElementById('bracket-sport-select').value;
+      BRACKETS_STORE[sport] = [
+        { id: '1', round: 1, team1: 'Team A', score1: 0, team2: 'Team B', score2: 0, winner: null },
+        { id: '2', round: 1, team1: 'Team C', score1: 0, team2: 'Team D', score2: 0, winner: null },
+        { id: '3', round: 2, team1: 'TBD', score1: 0, team2: 'TBD', score2: 0, winner: null }
+      ];
+      renderBracketTree(sport);
+      showToast('Bracket Reset', `${sport} tournament tree reset.`);
+    }
+
+    /* ==========================================================================
+       7. TAB 4: SCOREBOARD & POST SCORE
+       ========================================================================== */
+    function renderRecentScores() {
+      const container = document.getElementById('recent-scores-container');
+      if (!container) return;
+
+      container.innerHTML = scoresStore.map(s => `
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-3 shadow-xl">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-gcu-gold font-bold uppercase tracking-wider">${s.sport}</span>
+            <span class="text-slate-500 font-medium">${s.date || 'Recent'}</span>
+          </div>
+
+          <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 space-y-2">
+            <div class="flex justify-between items-center text-sm font-bold text-white">
+              <span>${s.team1}</span>
+              <span class="bg-slate-950 px-2.5 py-1 rounded text-gcu-gold text-base">${s.score1}</span>
+            </div>
+            <div class="flex justify-between items-center text-sm font-bold text-white border-t border-slate-800 pt-2">
+              <span>${s.team2}</span>
+              <span class="bg-slate-950 px-2.5 py-1 rounded text-gcu-gold text-base">${s.score2}</span>
+            </div>
+          </div>
+
+          ${s.notes ? `<p class="text-xs text-slate-400 italic">"${s.notes}"</p>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function handlePostScore(e) {
+      e.preventDefault();
+      const sport = document.getElementById('score-modal-sport').value;
+      const team1 = document.getElementById('score-team1').value;
+      const score1 = parseInt(document.getElementById('score-num1').value) || 0;
+      const team2 = document.getElementById('score-team2').value;
+      const score2 = parseInt(document.getElementById('score-num2').value) || 0;
+      const notes = document.getElementById('score-notes').value;
+
+      const newScore = {
+        id: 'score_' + Date.now(),
+        sport,
+        team1,
+        score1,
+        team2,
+        score2,
+        notes,
+        date: 'Just Now'
+      };
+
+      scoresStore.unshift(newScore);
+      saveState();
+      renderRecentScores();
+      renderStandings();
+      closeModal('post-score-modal');
+      document.getElementById('post-score-form').reset();
+      showToast('Score Posted!', `${team1} ${score1} - ${score2} ${team2}`);
+    }
+
+    /* ==========================================================================
+       8. TAB 5: MEDIA GALLERY
+       ========================================================================== */
+    function renderGallery() {
+      const container = document.getElementById('gallery-grid-container');
+      if (!container) return;
+
+      container.innerHTML = photosStore.map(p => `
+        <div class="glass-card rounded-2xl overflow-hidden border border-slate-800 shadow-xl group hover:border-gcu-gold/60 transition">
+          <div class="h-48 overflow-hidden relative">
+            <img src="${p.url}" alt="${p.caption}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=800&q=80'">
+            <span class="absolute top-3 right-3 bg-slate-950/80 text-gcu-gold px-2.5 py-1 rounded-full text-[10px] font-bold border border-gcu-gold/30">
+              ${p.sport}
+            </span>
+          </div>
+
+          <div class="p-4 space-y-2">
+            <p class="text-xs font-semibold text-white leading-snug">${p.caption}</p>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800">
+              <span>By ${p.uploader}</span>
+              <button onclick="likePhoto('${p.id}')" class="text-xs font-bold text-gcu-gold hover:scale-110 transition flex items-center gap-1">
+                👏 <span>${p.likes}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function handlePhotoUpload(e) {
+      e.preventDefault();
+      const urlInput = document.getElementById('photo-url').value;
+      const caption = document.getElementById('photo-caption').value;
+      const sport = document.getElementById('photo-sport').value;
+      const uploader = document.getElementById('photo-uploader').value;
+
+      const fallbackUrl = 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=800&q=80';
+
+      const newPhoto = {
+        id: 'photo_' + Date.now(),
+        url: urlInput || fallbackUrl,
+        caption,
+        sport,
+        uploader,
+        likes: 1
+      };
+
+      photosStore.unshift(newPhoto);
+      saveState();
+      renderGallery();
+      closeModal('upload-photo-modal');
+      document.getElementById('upload-photo-form').reset();
+      showToast('Photo Published!', 'Your photo is now live in the community gallery.');
+    }
+
+    function likePhoto(photoId) {
+      const photo = photosStore.find(p => p.id === photoId);
+      if (photo) {
+        photo.likes += 1;
+        saveState();
+        renderGallery();
+      }
+    }
+
+    /* ==========================================================================
+       9. TAB 6: SATISFACTION SURVEY SUBMISSION
+       ========================================================================== */
+    function handleSurveySubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      const rating = formData.get('rating');
+      const sports = formData.getAll('sports_pref').join(', ');
+      const time = formData.get('time_pref');
+
+      showToast('Survey Submitted!', `Thank you! Rated ${rating}★ for preferred sports: ${sports || 'All'}.`);
+      form.reset();
+    }
+  </script>
+</body>
+</html>
